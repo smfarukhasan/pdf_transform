@@ -51,12 +51,31 @@ class AppDrawer extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: const Icon(Icons.auto_stories, color: AppColors.primary, size: 32),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.auto_stories,
+                        color: AppColors.primary,
+                        size: 30,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 14),
                 const Expanded(
@@ -64,15 +83,15 @@ class AppDrawer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'KhubSojaDoc',
+                        'File Transformer',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 19,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'খুব সোজা ডক ও অফিস স্যুট',
+                        'স্মার্ট ডকুমেন্ট ও অফিস স্যুট',
                         style: TextStyle(
                           color: AppColors.accentLight,
                           fontSize: 12.5,

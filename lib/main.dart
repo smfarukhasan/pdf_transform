@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'constants/app_theme.dart';
-import 'screens/home/home_screen.dart';
+import 'screens/splash/splash_screen.dart';
 import 'services/storage_service.dart';
 
 void main() async {
@@ -17,24 +17,25 @@ void main() async {
     ),
   );
 
-  // Initialize KhubSojaDoc primary directory immediately on launch
+  // Initialize primary directory immediately on launch
   try {
     await StorageService().getAppDirectory();
   } catch (_) {}
 
-  runApp(const KhubSojaDocApp());
+  runApp(const FileTransformerApp());
 }
 
-class KhubSojaDocApp extends StatelessWidget {
-  const KhubSojaDocApp({super.key});
+class FileTransformerApp extends StatelessWidget {
+  const FileTransformerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'KhubSojaDoc',
+      title: 'File Transformer',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
+

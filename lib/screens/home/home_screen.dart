@@ -85,21 +85,24 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Text(
-              'KhubSojaDoc',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 30,
+                height: 30,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.auto_awesome_motion,
+                  size: 26,
+                  color: AppColors.primary,
+                ),
+              ),
             ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Text(
-                'খুব সোজা ডক',
-                style: TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.bold),
-              ),
+            const SizedBox(width: 10),
+            const Text(
+              'File Transformer',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
           ],
         ),
