@@ -46,7 +46,7 @@ class AppDrawer extends StatelessWidget {
               right: 20,
             ),
             decoration: const BoxDecoration(
-              gradient: AppColors.primaryGradient,
+              color: AppColors.primary,
             ),
             child: Row(
               children: [
