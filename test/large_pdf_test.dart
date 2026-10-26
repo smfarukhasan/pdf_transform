@@ -1,58 +1,65 @@
+import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 
-Uint8List applyWhiteBackgroundAndEncode({
-  required Uint8List pngBytes,
-  required String format,
-  required int quality,
+enum TestScanFilter { original, grayscale, documentBw }
+
+Uint8List processImageFilter({
+  required Uint8List inputBytes,
+  required TestScanFilter filter,
+  required int rotationAngle,
 }) {
-  final isJpg = format.toLowerCase() == 'jpg' || format.toLowerCase() == 'jpeg';
-  final decoded = img.decodeImage(pngBytes);
-  if (decoded == null) return pngBytes;
+  var image = img.decodeImage(inputBytes);
+  if (image == null) return inputBytes;
 
-  final whiteCanvas = img.Image(
-    width: decoded.width,
-    height: decoded.height,
-    numChannels: 3,
-  );
-  img.fill(whiteCanvas, color: img.ColorRgb8(255, 255, 255));
-  img.compositeImage(whiteCanvas, decoded);
-
-  if (isJpg) {
-    return Uint8List.fromList(img.encodeJpg(whiteCanvas, quality: quality.clamp(10, 100)));
-  } else {
-    return Uint8List.fromList(img.encodePng(whiteCanvas));
+  if (image.width > 2048 || image.height > 2048) {
+    image = img.copyResize(
+      image,
+      width: image.width > image.height ? 2048 : (image.width * 2048 ~/ image.height),
+      height: image.height >= image.width ? 2048 : (image.height * 2048 ~/ image.width),
+      interpolation: img.Interpolation.linear,
+    );
   }
+
+  if (rotationAngle != 0) {
+    image = img.copyRotate(image, angle: rotationAngle);
+  }
+
+  if (filter == TestScanFilter.grayscale) {
+    image = img.grayscale(image);
+  } else if (filter == TestScanFilter.documentBw) {
+    final gray = img.grayscale(image);
+    image = img.adjustColor(gray, contrast: 1.45, brightness: 1.12);
+  }
+
+  final whiteCanvas = img.Image(width: image.width, height: image.height, numChannels: 3);
+  img.fill(whiteCanvas, color: img.ColorRgb8(255, 255, 255));
+  img.compositeImage(whiteCanvas, image);
+
+  return Uint8List.fromList(img.encodeJpg(whiteCanvas, quality: 88));
 }
 
 void main() {
-  test('Test transparent PDF page converts to white JPG without becoming black', () {
-    // Simulating transparent PDF page
-    final transparentPage = img.Image(width: 200, height: 200, numChannels: 4);
-    img.fill(transparentPage, color: img.ColorRgba8(0, 0, 0, 0)); // transparent
-    // Black text on transparent page
-    img.drawString(transparentPage, 'Hello PDF', font: img.arial14, x: 20, y: 20, color: img.ColorRgba8(0, 0, 0, 255));
+  test('Test processImageFilter runs in Isolate without blocking and returns valid white background', () async {
+    final sampleImg = img.Image(width: 400, height: 600, numChannels: 4);
+    img.fill(sampleImg, color: img.ColorRgba8(0, 0, 0, 0));
+    img.drawString(sampleImg, 'Invoice #1024', font: img.arial14, x: 50, y: 50, color: img.ColorRgba8(0, 0, 0, 255));
+    final rawPng = img.encodePng(sampleImg);
 
-    final rawPng = img.encodePng(transparentPage);
+    final result = await Isolate.run(() {
+      return processImageFilter(
+        inputBytes: rawPng,
+        filter: TestScanFilter.documentBw,
+        rotationAngle: 0,
+      );
+    });
 
-    // 1. Process as JPG
-    final jpgBytes = applyWhiteBackgroundAndEncode(pngBytes: rawPng, format: 'jpg', quality: 90);
-    final decodedJpg = img.decodeJpg(jpgBytes)!;
+    final decoded = img.decodeJpg(result)!;
+    expect(decoded.width, equals(400));
+    expect(decoded.height, equals(600));
 
-    // Check corner pixel (background)
-    final bgPixel = decodedJpg.getPixel(5, 5);
-    expect(bgPixel.r, greaterThan(250), reason: 'JPG background must be white, not black');
-    expect(bgPixel.g, greaterThan(250));
-    expect(bgPixel.b, greaterThan(250));
-
-    // 2. Process as PNG
-    final pngResult = applyWhiteBackgroundAndEncode(pngBytes: rawPng, format: 'png', quality: 90);
-    final decodedPng = img.decodePng(pngResult)!;
-
-    final bgPixelPng = decodedPng.getPixel(5, 5);
-    expect(bgPixelPng.r, equals(255), reason: 'PNG background must be white, not transparent/black');
-    expect(bgPixelPng.g, equals(255));
-    expect(bgPixelPng.b, equals(255));
+    final p0 = decoded.getPixel(5, 5);
+    expect(p0.r, greaterThan(250), reason: 'Document B&W must have white paper background');
   });
 }

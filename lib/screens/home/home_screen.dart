@@ -34,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<RecentItem> _recentItems = [];
   List<DraftItem> _activeDrafts = [];
-  int _khubSojaDocFileCount = 0;
   bool _isLoading = true;
 
   @override
@@ -55,13 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadDashboardData() async {
     final recent = await _recentService.getRecentItems();
     final drafts = await _draftService.getAllDrafts();
-    final files = await _storageService.getKhubSojaDocFiles();
 
     if (mounted) {
       setState(() {
         _recentItems = recent;
         _activeDrafts = drafts;
-        _khubSojaDocFileCount = files.length;
         _isLoading = false;
       });
     }
@@ -160,9 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Dedicated Folder Info Banner
-                    _buildKhubSojaDocBanner(),
-
                     // Incomplete Work Drafts Banner (if any)
                     if (_activeDrafts.isNotEmpty) _buildDraftsAlertBanner(),
 
@@ -222,54 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildKhubSojaDocBanner() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.blue.shade100),
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const KhubSojaDocFolderScreen()),
-          ).then((_) => _loadDashboardData());
-        },
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.folder_special, color: Colors.white, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'ডিফল্ট ফোল্ডার: KhubSojaDoc',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: AppColors.primary),
-                  ),
-                  Text(
-                    'অ্যাপের সব ফাইল ও আউটপুট এখানে সংরক্ষিত ($_khubSojaDocFileCount টি ফাইল)',
-                    style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.primary),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildDraftsAlertBanner() {
     return Container(
@@ -544,8 +490,14 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (context, index) {
             final t = tools[index];
             return Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 1.5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 1.2,
+                ),
+              ),
               child: InkWell(
                 onTap: t['onTap'] as VoidCallback,
                 borderRadius: BorderRadius.circular(16),
