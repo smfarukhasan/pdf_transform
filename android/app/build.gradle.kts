@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.khubsojadoc.khubsojadoc"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -22,9 +22,9 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.khubsojadoc.khubsojadoc"
-        // Android 12 and higher rule
+        // Android 12 and higher rule (minSdk 31)
         minSdk = 31
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
