@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../constants/app_colors.dart';
 import '../../models/draft_item.dart';
 import '../../services/office_service.dart';
@@ -75,10 +76,11 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('প্যারাগ্রাফ #${index + 1} এডিট করুন'),
+        title: Text('প্যারাগ্রাফ #${index + 1} এডিট করুন', style: GoogleFonts.hindSiliguri(fontWeight: FontWeight.bold)),
         content: TextField(
           controller: controller,
           maxLines: 6,
+          style: GoogleFonts.hindSiliguri(fontSize: 15, height: 1.5),
           decoration: const InputDecoration(hintText: 'টেক্সট লিখুন...'),
         ),
         actions: [
@@ -105,10 +107,11 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('নতুন প্যারাগ্রাফ যোগ করুন'),
+        title: Text('নতুন প্যারাগ্রাফ যোগ করুন', style: GoogleFonts.hindSiliguri(fontWeight: FontWeight.bold)),
         content: TextField(
           controller: controller,
           maxLines: 5,
+          style: GoogleFonts.hindSiliguri(fontSize: 15, height: 1.5),
           decoration: const InputDecoration(hintText: 'এখানে নতুন প্যারাগ্রাফ লিখুন...'),
         ),
         actions: [
@@ -290,7 +293,11 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
                               const Divider(height: 8),
                               Text(
                                 p,
-                                style: const TextStyle(fontSize: 14, height: 1.5, color: AppColors.textPrimary),
+                                style: GoogleFonts.hindSiliguri(
+                                  fontSize: 14.5,
+                                  height: 1.55,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ],
                           ),

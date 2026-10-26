@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
@@ -24,7 +25,7 @@ class OfficeService {
 
       if (docFile == null) return [];
 
-      final content = String.fromCharCodes(docFile.content as List<int>);
+      final content = utf8.decode(docFile.content as List<int>, allowMalformed: true);
       final document = XmlDocument.parse(content);
 
       final List<String> paragraphs = [];
@@ -69,11 +70,12 @@ class OfficeService {
 
     buffer.writeln('</w:body></w:document>');
     final newDocXml = buffer.toString();
+    final newDocBytes = utf8.encode(newDocXml);
 
     // Copy all other files except document.xml
     for (final file in originalArchive.files) {
       if (file.name == 'word/document.xml') {
-        newArchive.addFile(ArchiveFile('word/document.xml', newDocXml.length, newDocXml.codeUnits));
+        newArchive.addFile(ArchiveFile('word/document.xml', newDocBytes.length, newDocBytes));
       } else {
         newArchive.addFile(file);
       }
@@ -81,7 +83,7 @@ class OfficeService {
 
     // If word/document.xml was not present for some reason, add it
     if (newArchive.findFile('word/document.xml') == null) {
-      newArchive.addFile(ArchiveFile('word/document.xml', newDocXml.length, newDocXml.codeUnits));
+      newArchive.addFile(ArchiveFile('word/document.xml', newDocBytes.length, newDocBytes));
     }
 
     final encoded = ZipEncoder().encode(newArchive);
@@ -193,7 +195,7 @@ class OfficeService {
 
       for (int i = 0; i < slideFiles.length; i++) {
         final f = slideFiles[i];
-        final content = String.fromCharCodes(f.content as List<int>);
+        final content = utf8.decode(f.content as List<int>, allowMalformed: true);
         final doc = XmlDocument.parse(content);
 
         final textNodes = doc.findAllElements('a:t');
@@ -231,7 +233,7 @@ class OfficeService {
     for (final file in originalArchive.files) {
       if (slideTextMap.containsKey(file.name)) {
         final newTexts = slideTextMap[file.name]!;
-        final content = String.fromCharCodes(file.content as List<int>);
+        final content = utf8.decode(file.content as List<int>, allowMalformed: true);
         final doc = XmlDocument.parse(content);
 
         final textNodes = doc.findAllElements('a:t').toList();
@@ -240,7 +242,8 @@ class OfficeService {
         }
 
         final updatedXml = doc.toXmlString();
-        newArchive.addFile(ArchiveFile(file.name, updatedXml.length, updatedXml.codeUnits));
+        final updatedBytes = utf8.encode(updatedXml);
+        newArchive.addFile(ArchiveFile(file.name, updatedBytes.length, updatedBytes));
       } else {
         newArchive.addFile(file);
       }

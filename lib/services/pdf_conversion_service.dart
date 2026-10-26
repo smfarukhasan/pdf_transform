@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:printing/printing.dart';
@@ -180,14 +181,16 @@ class PdfConversionService {
   <Default Extension="xml" ContentType="application/xml"/>
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
 </Types>''';
-    archive.addFile(ArchiveFile('[Content_Types].xml', contentTypes.length, contentTypes.codeUnits));
+    final contentTypesBytes = utf8.encode(contentTypes);
+    archive.addFile(ArchiveFile('[Content_Types].xml', contentTypesBytes.length, contentTypesBytes));
 
     // 2. _rels/.rels
     const rootRels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
 </Relationships>''';
-    archive.addFile(ArchiveFile('_rels/.rels', rootRels.length, rootRels.codeUnits));
+    final rootRelsBytes = utf8.encode(rootRels);
+    archive.addFile(ArchiveFile('_rels/.rels', rootRelsBytes.length, rootRelsBytes));
 
     // 3. word/document.xml with escaped paragraphs
     final buffer = StringBuffer();
@@ -203,7 +206,8 @@ class PdfConversionService {
 
     buffer.writeln('</w:body></w:document>');
     final docXml = buffer.toString();
-    archive.addFile(ArchiveFile('word/document.xml', docXml.length, docXml.codeUnits));
+    final docBytes = utf8.encode(docXml);
+    archive.addFile(ArchiveFile('word/document.xml', docBytes.length, docBytes));
 
     final zipData = ZipEncoder().encode(archive);
     if (zipData != null) {

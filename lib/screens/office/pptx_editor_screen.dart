@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../constants/app_colors.dart';
 import '../../services/office_service.dart';
 import '../common/save_export_dialog.dart';
@@ -48,10 +49,11 @@ class _PptxEditorScreenState extends State<PptxEditorScreen> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('স্লাইড #${slideIndex + 1} টেক্সট এডিট'),
+        title: Text('স্লাইড #${slideIndex + 1} টেক্সট এডিট', style: GoogleFonts.hindSiliguri(fontWeight: FontWeight.bold)),
         content: TextField(
           controller: controller,
           maxLines: 4,
+          style: GoogleFonts.hindSiliguri(fontSize: 15, height: 1.5),
           decoration: const InputDecoration(hintText: 'টেক্সট লিখুন...'),
         ),
         actions: [
@@ -212,7 +214,7 @@ class _PptxEditorScreenState extends State<PptxEditorScreen> {
                                         Expanded(
                                           child: Text(
                                             texts[textIdx],
-                                            style: const TextStyle(fontSize: 13.5),
+                                            style: GoogleFonts.hindSiliguri(fontSize: 14, height: 1.5),
                                           ),
                                         ),
                                         IconButton(

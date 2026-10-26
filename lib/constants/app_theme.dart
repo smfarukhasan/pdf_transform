@@ -11,6 +11,7 @@ class AppTheme {
       brightness: Brightness.light,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
+      fontFamily: GoogleFonts.hindSiliguri().fontFamily,
       colorScheme: ColorScheme.light(
         primary: AppColors.primary,
         onPrimary: Colors.white,
